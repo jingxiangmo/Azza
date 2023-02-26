@@ -1,5 +1,7 @@
 import os
 import gradio as gr
+import wikipediaapi as wk
+
 
 from transformers import (
     TokenClassificationPipeline,
@@ -29,16 +31,27 @@ class KeyphraseExtractionPipeline(TokenClassificationPipeline):
 model_name = "ml6team/keyphrase-extraction-kbir-inspec"
 extractor = KeyphraseExtractionPipeline(model=model_name)
 
-# Inference
-def keyphrases_out(input):
+
+def keyphrases_out(input): #Not used but might be useful
     input = input.replace("\n", " ")
     keyphrases = extractor(input)
     out = "The Key Phrases in your text are:\n\n"
     for k in keyphrases:
         out += k + "\n"
-    return out
+    return keyphrases
 
-demo = gr.Interface(fn=keyphrases_out, inputs = "text", outputs = "text")
+def wikipedia_search(input):
+    input = input.replace("\n", " ")
+    keyphrases = extractor(input)
+    wiki = wk.Wikipedia('en')
+    for k in keyphrases:
+        page = wiki.page(k)
+        if page.exists():
+            break
+    return page.summary
+
+
+demo = gr.Interface(fn=wikipedia_search, inputs = "text", outputs = "text")
 
 demo.launch()
 
