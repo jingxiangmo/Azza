@@ -42,7 +42,14 @@ def wikipedia_search(input: str) -> str:
     
     try :
         #TODO: add better extraction and search
-        page = wiki.page(keyphrases[0])
+        keyphrase_index = 0
+        page = wiki.page(keyphrases[keyphrase_index])
+
+        while not ('.' in page.summary) or not page.exists():
+            keyphrase_index += 1
+            if keyphrase_index == len(keyphrases):
+                raise Exception
+            page = wiki.page(keyphrases[keyphrase_index])
         return  page.summary
     except:
         return "I cannot answer this question"
