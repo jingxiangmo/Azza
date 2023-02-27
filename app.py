@@ -62,7 +62,7 @@ demo = gr.Interface(
     inputs = "text", 
     outputs = "text",
 
-    examples=examples
+    examples=examples,
     )
 
 if __name__ == "__main__":
