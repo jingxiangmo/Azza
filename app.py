@@ -6,11 +6,11 @@ from transformers import (
     TokenClassificationPipeline,
     AutoModelForTokenClassification,
     AutoTokenizer,
+    BertForQuestionAnswering,
+    BertTokenizer
 )
-import torch
 from transformers.pipelines import AggregationStrategy
-from transformers import BertForQuestionAnswering
-from transformers import BertTokenizer
+import torch
 
 # =====[ DEFINE PIPELINE ]===== #
 class KeyphraseExtractionPipeline(TokenClassificationPipeline):
@@ -125,13 +125,11 @@ def answer_question(question):
     return 'Answer: "' + answer + '"'
 
 # =====[ DEFINE INTERFACE ]===== #'
-title = "Azza Chatbot"
+title = "Azza Conversational Agent"
 examples = [
     ["Where is the Eiffel Tower?"],
     ["What is the population of France?"]
 ]
-
-
 
 demo = gr.Interface(
     title = title,
