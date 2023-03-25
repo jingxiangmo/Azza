@@ -2,6 +2,7 @@ import os
 import gradio as gr
 import numpy as np
 import wikipediaapi as wk
+import wikipedia
 from transformers import (
     TokenClassificationPipeline,
     AutoModelForTokenClassification,
@@ -11,7 +12,7 @@ from transformers import (
 )
 from transformers.pipelines import AggregationStrategy
 import torch
-
+print("hello")
 # =====[ DEFINE PIPELINE ]===== #
 class KeyphraseExtractionPipeline(TokenClassificationPipeline):
     def __init__(self, model, *args, **kwargs):
@@ -43,26 +44,36 @@ def keyphrases_extraction(text: str) -> str:
 def wikipedia_search(input: str) -> str:
     input = input.replace("\n", " ")
     keyphrases = keyphrases_extraction(input)
+
     wiki = wk.Wikipedia('en')
     
     try :
         #TODO: add better extraction and search
-        keyphrase_index = 0
-        page = wiki.page(keyphrases[keyphrase_index])
+        if len(keyphrases) == 0:
+            return "Can you add more details to your question?"
+    
+        query_suggestion = wikipedia.suggest(keyphrases[0])
+        if(query_suggestion != None):
+            results = wikipedia.search(query_suggestion)
+        else:
+            results = wikipedia.search(keyphrases[0])
 
+        index = 0
+        page = wiki.page(results[index])
         while not ('.' in page.summary) or not page.exists():
-            keyphrase_index += 1
-            if keyphrase_index == len(keyphrases):
+            index += 1
+            if index == len(results):
                 raise Exception
-            page = wiki.page(keyphrases[keyphrase_index])
-        return  page.summary
+            page = wiki.page(results[index])
+        return page.summary
+    
     except:
         return "I cannot answer this question"
     
 def answer_question(question):
 
     context = wikipedia_search(question)
-    if context == "I cannot answer this question":
+    if (context == "I cannot answer this question") or (context == "Can you add more details to your question?"):
         return context
 
     # ======== Tokenize ========
@@ -99,6 +110,8 @@ def answer_question(question):
 
     start_scores = outputs.start_logits
     end_scores = outputs.end_logits
+    print(start_scores)
+    print(end_scores)
 
     # ======== Reconstruct Answer ========
     # Find the tokens with the highest `start` and `end` scores.
@@ -130,7 +143,7 @@ examples = [
     ["Where is the Eiffel Tower?"],
     ["What is the population of France?"]
 ]
-
+print("hello")
 demo = gr.Interface(
     title = title,
 
