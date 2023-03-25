@@ -12,7 +12,7 @@ from transformers import (
 )
 from transformers.pipelines import AggregationStrategy
 import torch
-print("hello")
+
 # =====[ DEFINE PIPELINE ]===== #
 class KeyphraseExtractionPipeline(TokenClassificationPipeline):
     def __init__(self, model, *args, **kwargs):
@@ -48,7 +48,6 @@ def wikipedia_search(input: str) -> str:
     wiki = wk.Wikipedia('en')
     
     try :
-        #TODO: add better extraction and search
         if len(keyphrases) == 0:
             return "Can you add more details to your question?"
     
@@ -162,7 +161,7 @@ def answer_question(question):
     return final_answer
 
 # =====[ DEFINE INTERFACE ]===== #'
-title = "Azza Conversational Agent"
+title = "Azza Q/A Agent"
 examples = [
     ["Where is the Eiffel Tower?"],
     ["What is the population of France?"]
