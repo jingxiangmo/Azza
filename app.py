@@ -78,16 +78,21 @@ def answer_question(question):
 
     # ======== Tokenize ========
     # Apply the tokenizer to the input text, treating them as a text-pair.
+
+
     input_ids = tokenizer.encode(question, context)
+    question_ids = input_ids[:input_ids.index(tokenizer.sep_token_id)+1]
 
     # Report how long the input sequence is. if longer than 512 tokens divide it multiple sequences
 
-    print(f"Query has {len(input_ids)} tokens, divided in {len(input_ids)//513 + 1}.\n")
+    length_of_group = 512 - len(question_ids)
+    input_ids_without_question = input_ids[input_ids.index(tokenizer.sep_token_id)+1:]
+    print(f"Query has {len(input_ids)} tokens, divided in {len(input_ids_without_question)//length_of_group + 1}.\n")
 
     input_ids_split = []
-    for group in range(len(input_ids)//513):
-        input_ids_split.append(input_ids[512*group:512*(group+1)-1])
-    input_ids_split.append(input_ids[512*(len(input_ids)//513):len(input_ids)-1])
+    for group in range(len(input_ids_without_question)//length_of_group + 1):
+        input_ids_split.append(question_ids + input_ids_without_question[length_of_group*group:length_of_group*(group+1)-1])
+    input_ids_split.append(question_ids + input_ids_without_question[length_of_group*(len(input_ids_without_question)//length_of_group + 1):len(input_ids_without_question)-1])
     
     scores = []
     for input in input_ids_split:
@@ -153,6 +158,8 @@ def answer_question(question):
     # Compare scores for answers found and each paragraph and pick the most relevant.
 
     final_answer = max(scores, key=lambda x: x[0] + x[1])[2]
+
+    return final_answer
 
 # =====[ DEFINE INTERFACE ]===== #'
 title = "Azza Conversational Agent"
