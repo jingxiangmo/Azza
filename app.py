@@ -36,7 +36,6 @@ extractor = KeyphraseExtractionPipeline(model=keyPhraseExtractionModel)
 model = BertForQuestionAnswering.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad')
 tokenizer = BertTokenizer.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad')
 
-#TODO: add further preprocessing
 def keyphrases_extraction(text: str) -> str:
     keyphrases = extractor(text)
     return keyphrases
@@ -78,12 +77,10 @@ def answer_question(question):
     # ======== Tokenize ========
     # Apply the tokenizer to the input text, treating them as a text-pair.
 
-
     input_ids = tokenizer.encode(question, context)
     question_ids = input_ids[:input_ids.index(tokenizer.sep_token_id)+1]
 
     # Report how long the input sequence is. if longer than 512 tokens divide it multiple sequences
-
     length_of_group = 512 - len(question_ids)
     input_ids_without_question = input_ids[input_ids.index(tokenizer.sep_token_id)+1:]
     print(f"Query has {len(input_ids)} tokens, divided in {len(input_ids_without_question)//length_of_group + 1}.\n")
@@ -126,8 +123,6 @@ def answer_question(question):
         print(max_start_score)
         print(max_end_score)
 
-
-
     # ======== Reconstruct Answer ========
     # Find the tokens with the highest `start` and `end` scores.
     
@@ -161,20 +156,19 @@ def answer_question(question):
     return final_answer
 
 # =====[ DEFINE INTERFACE ]===== #'
-title = "Azza Q/A Agent"
+title = "Azza Knowledge Agent"
 examples = [
     ["Where is the Eiffel Tower?"],
     ["What is the population of France?"]
 ]
-print("hello")
 demo = gr.Interface(
     title = title,
 
     fn=answer_question,
     inputs = "text", 
     outputs = "text",
-
     examples=examples,
+    allow_flagging="never",
     )
 
 if __name__ == "__main__":
