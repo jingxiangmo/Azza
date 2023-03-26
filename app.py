@@ -13,6 +13,7 @@ from transformers import (
 )
 from transformers.pipelines import AggregationStrategy
 import torch
+from dotenv import load_dotenv
 
 
 # =====[ DEFINE PIPELINE ]===== #
@@ -33,6 +34,9 @@ class KeyphraseExtractionPipeline(TokenClassificationPipeline):
         return np.unique([result.get("word").strip() for result in results])
 
 
+load_dotenv()
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
 # =====[ LOAD PIPELINE ]===== #
 keyPhraseExtractionModel = "ml6team/keyphrase-extraction-kbir-inspec"
 extractor = KeyphraseExtractionPipeline(model=keyPhraseExtractionModel)
@@ -44,14 +48,18 @@ tokenizer = BertTokenizer.from_pretrained(
 )
 
 
-def keyphrases_extraction(text: str) -> str:
-    keyphrases = extractor(text)
-    return keyphrases
-
-
 def wikipedia_search(input: str) -> str:
+    """Perform a Wikipedia search using keyphrases.
+
+    Args:
+        input (str): The input text.
+
+    Returns:
+        str: The summary of the Wikipedia page.
+    """
+
     input = input.replace("\n", " ")
-    keyphrases = keyphrases_extraction(input)
+    keyphrases = extractor(input)
 
     wiki = wk.Wikipedia("en")
 
@@ -78,15 +86,23 @@ def wikipedia_search(input: str) -> str:
         return "I cannot answer this question"
 
 
-def answer_question(question):
+def answer_question(question: str) -> str:
+    """Answer the question using the context from the Wikipedia search.
+
+    Args:
+        question (str): The input question.
+
+    Returns:
+        str: The answer to the question.
+    """
+
     context = wikipedia_search(question)
     if (context == "I cannot answer this question") or (
         context == "Can you add more details to your question?"
     ):
         return context
 
-    # Tokenize
-    # Apply the tokenizer to the input text, treating them as a text-pair.
+    # Tokenize and split input
     input_ids = tokenizer.encode(question, context)
     question_ids = input_ids[: input_ids.index(tokenizer.sep_token_id) + 1]
 
@@ -157,7 +173,14 @@ def answer_question(question):
         scores.append((max_start_score, max_end_score, answer))
 
     # Compare scores for answers found and each paragraph and pick the most relevant.
-    return max(scores, key=lambda x: x[0] + x[1])[2]
+    answer = max(scores, key=lambda x: x[0] + x[1])[2]
+
+    response = openai.Completion.create(
+        model="text-davinci-003",
+        prompt="Answer the question " + question + "using this answer: " + answer,
+        max_tokens=3000,
+    )
+    return response.choices[0].text.replace("\n\n", " ")
 
 
 # =====[ DEFINE INTERFACE ]===== #'
