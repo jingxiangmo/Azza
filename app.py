@@ -33,7 +33,6 @@ class KeyphraseExtractionPipeline(TokenClassificationPipeline):
         )
         return np.unique([result.get("word").strip() for result in results])
 
-
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
@@ -47,7 +46,6 @@ tokenizer = BertTokenizer.from_pretrained(
     "bert-large-uncased-whole-word-masking-finetuned-squad"
 )
 
-
 def wikipedia_search(input: str) -> str:
     """Perform a Wikipedia search using keyphrases.
 
@@ -58,9 +56,7 @@ def wikipedia_search(input: str) -> str:
         str: The summary of the Wikipedia page.
     """
 
-    input = input.replace("\n", " ")
-    keyphrases = extractor(input)
-
+    keyphrases = extractor( input.replace("\n", " "))
     wiki = wk.Wikipedia("en")
 
     try:
@@ -68,7 +64,7 @@ def wikipedia_search(input: str) -> str:
             return "Can you add more details to your question?"
 
         query_suggestion = wikipedia.suggest(keyphrases[0])
-        if query_suggestion != None:
+        if query_suggestion is not None:
             results = wikipedia.search(query_suggestion)
         else:
             results = wikipedia.search(keyphrases[0])
@@ -81,7 +77,6 @@ def wikipedia_search(input: str) -> str:
                 raise Exception
             page = wiki.page(results[index])
         return page.summary
-
     except:
         return "I cannot answer this question"
 
@@ -133,7 +128,6 @@ def answer_question(question: str) -> str:
             - 1
         ]
     )
-
     scores = []
     for input in input_ids_split:
         # set Segment IDs
@@ -181,7 +175,6 @@ def answer_question(question: str) -> str:
         max_tokens=3000,
     )
     return response.choices[0].text.replace("\n\n", " ")
-
 
 # =====[ DEFINE INTERFACE ]===== #'
 title = "Azza Knowledge Agent"
