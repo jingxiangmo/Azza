@@ -106,9 +106,6 @@ def answer_question(question: str) -> str:
     input_ids_without_question = input_ids[
         input_ids.index(tokenizer.sep_token_id) + 1 :
     ]
-    print(
-        f"Query has {len(input_ids)} tokens, divided in {len(input_ids_without_question)//length_of_group + 1}.\n"
-    )
 
     input_ids_split = []
     for group in range(len(input_ids_without_question) // length_of_group + 1):
@@ -139,10 +136,10 @@ def answer_question(question: str) -> str:
 
         # evaulate the model
         outputs = model(
-            torch.tensor([input]),  # The tokens representing our input text.
+            torch.tensor([input]),
             token_type_ids=torch.tensor(
                 [segment_ids]
-            ),  # The segment IDs to differentiate question from answer_text
+            ), 
             return_dict=True,
         )
 
