@@ -5,3 +5,4 @@ wikipedia-api
 torch 
 torchvision 
 torchaudio
+openai
