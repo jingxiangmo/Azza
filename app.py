@@ -174,7 +174,7 @@ def answer_question(question: str) -> str:
     return response.choices[0].text.replace("\n\n", " ")
 
 # =====[ DEFINE INTERFACE ]===== #'
-title = "Azza Knowledge Agent"
+title = "Azza - Grounded Q/A Conversational Agent 🤖"
 examples = [["Where is the Eiffel Tower?"], ["What is the population of France?"]]
 demo = gr.Interface(
     title=title,
