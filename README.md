@@ -9,7 +9,7 @@ pinned: false
 # [Azza](jingxiangmo-azza.hf.space/) - Grounded Q/A Conversational Agent 🤖
 > We applied BERT to the Stanford Question Answering Dataset (SQuAD) to achieve *natural and grounded* human-level performance on question answering.
 
-Link to demo: jingxiangmo-azza.hf.space/
+Link to demo: https://huggingface.co/spaces/jingxiangmo/Azza
 
 <br>
 
